@@ -109,6 +109,32 @@ oder sprengt sie.
 | Karte 1 | 8066 MiB | **15173 MiB** |
 | gesamt | 23,1 GiB | **28,9 GiB** |
 
+### Vulkan kostet weniger, als man denkt
+
+Identisches Modell und identische Parameter, `llama-bench`:
+
+| Kontext | Prefill CUDA | Prefill Vulkan | Decode CUDA | Decode Vulkan |
+|---|---:|---:|---:|---:|
+| leer | 2513 | 2059 (−18 %) | 44,8 | 41,7 (−7 %) |
+| 16k gefüllt | 2159 | 1681 (−22 %) | 41,4 | 39,1 (−6 %) |
+| 64k gefüllt | 1226 | 1083 (−12 %) | 34,1 | 33,3 (−2 %) |
+
+Vulkan spricht die Tensor-Kerne an (`matrix cores: NV_coopmat2`) und beherrscht
+auch Flash-Attention mit quantisiertem KV-Cache. Damit ist der herstellerneutrale
+Weg für Sprachmodelle praktikabel — relevant, wenn AMD-Karten im Spiel sind.
+**Für Diffusion gilt das nicht:** PyTorch kennt nur CUDA oder ROCm.
+
+### Langer Kontext ist billig — bis er gefüllt ist
+
+| | leer | 64k gefüllt | |
+|---|---:|---:|---:|
+| Prefill | 2513 t/s | 1226 t/s | −51 % |
+| Decode | 44,8 t/s | 34,1 t/s | −24 % |
+
+Ein Modell mit 128k Kontext zu **starten** kostet fast nichts. Ihn tatsächlich zu
+**füllen** kostet die Hälfte der Einlesegeschwindigkeit. Wer Decode-Werte bei
+leerem Kontext misst, überschätzt das System für Agentenbetrieb erheblich.
+
 ### Mehr Parallelität ist oft langsamer
 
 - **Threads:** Bei 8-Kanal-DDR4 sättigen etwa 8 Kerne die Bandbreite. Ein
