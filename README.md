@@ -126,14 +126,21 @@ Weg für Sprachmodelle praktikabel — relevant, wenn AMD-Karten im Spiel sind.
 
 ### Langer Kontext ist billig — bis er gefüllt ist
 
-| | leer | 64k gefüllt | |
-|---|---:|---:|---:|
-| Prefill | 2513 t/s | 1226 t/s | −51 % |
-| Decode | 44,8 t/s | 34,1 t/s | −24 % |
+| Füllstand | Prefill | Decode |
+|---|---:|---:|
+| leer | 2499 t/s | 44,8 t/s |
+| 64k | 1224 t/s | 33,8 t/s |
+| **128k** | **790 t/s** | **27,5 t/s** |
 
 Ein Modell mit 128k Kontext zu **starten** kostet fast nichts. Ihn tatsächlich zu
-**füllen** kostet die Hälfte der Einlesegeschwindigkeit. Wer Decode-Werte bei
-leerem Kontext misst, überschätzt das System für Agentenbetrieb erheblich.
+**füllen** kostet zwei Drittel der Einlesegeschwindigkeit und 39 % beim Erzeugen.
+Wer Decode-Werte bei leerem Kontext misst, überschätzt das System für
+Agentenbetrieb erheblich — 60.000 Token Vorgeschichte brauchen bei 790 t/s über
+eine Minute, bevor das erste Wort kommt.
+
+Nebenbei: **Der Vulkan-Rückstand verschwindet mit der Kontexttiefe** (−18 % bei
+leerem, +1 % bei vollem Kontext), weil dann die Aufmerksamkeitsberechnung über
+den Cache dominiert statt der Backend-Effizienz.
 
 ### Mehr Parallelität ist oft langsamer
 
