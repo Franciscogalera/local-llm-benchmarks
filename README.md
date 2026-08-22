@@ -5,6 +5,11 @@ auf eigener Hardware — mit Fokus darauf, **wo die Engpässe tatsächlich sitze
 und welche Stellschrauben etwas bringen. Jede Zahl ist gemessen, nicht geschätzt;
 wo Vorhersagen danebenlagen, steht das mit dabei.
 
+> **Einheiten:** Alle Angaben in GB, binär gezählt — so wie `nvidia-smi`, `free`
+> und die Karten selbst zählen (eine „16-GB-Karte" = 16 GB). Hugging-Face-Angaben
+> sind auf diese Skala umgerechnet und liegen deshalb rund 7 % unter den dort
+> genannten Zahlen.
+
 ## Hardware
 
 | | |
@@ -24,6 +29,7 @@ wo Vorhersagen danebenlagen, steht das mit dabei.
 | [01.08.](FINDINGS-2026-08-01.md) | Zweite Karte, Laguna S 2.1 (118B), Nemotron 3 Super (120B), DeepSeek V4 Flash |
 | [02.08.](FINDINGS-2026-08-02.md) | KV-Quantisierung und MTP am dichten 27B |
 | [04.08.](FINDINGS-2026-08-04.md) | DeepSeek V4 Flash in IQ2_M, Layer-Split ausgereizt, spekulatives Dekodieren |
+| [22.08.](FINDINGS-2026-08-22.md) | Qwen3.8-27B, KV-Cache-Quantisierung, Kosten einer freigehaltenen GPU |
 
 Jede Datei verlinkt ihren Vorgänger und schließt mit einer Liste offener Punkte,
 die in die nächste übernommen wird.
@@ -46,6 +52,31 @@ Lesen der Bytes. Eine Stufe gröber ist dann **schneller und besser zugleich**.
 Bandbreitenrechnungen gelten nur für Q4 und ähnliche Stufen — bei IQ1/IQ2
 dominiert die Rechenzeit. Eine vorab erstellte Prognose lag deshalb um Faktor 16
 daneben.
+
+### Beim KV-Cache gilt dasselbe — mit einer scharfen Schwelle
+
+Der KV-Cache wird bei **jedem** Token vollständig gelesen, teures Entpacken
+schlägt hier also besonders durch. Zwei Messungen, die zusammen die Schwelle
+zeigen.
+
+Von f16 auf `q8_0` (Qwen3.6-27B, `llama-bench`) — **kostenlos**, halber Speicher:
+
+| | pp512 | tg128 |
+|---|---:|---:|
+| KV f16, ohne Flash-Attention | 1723,58 ± 53,55 | 42,92 ± 0,03 |
+| KV q8_0 + Flash-Attention | 1737,44 ± 53,69 | 42,88 ± 0,03 |
+
+Eine Stufe tiefer kippt es (Qwen3.8-27B in Q4_K_M, beide Karten):
+
+| | 64k Kontext | 128k Kontext |
+|---|---:|---:|
+| **`q8_0`** (genau) | **73,9 t/s** | **69,1 t/s** |
+| **`iq4_nl`** (sparsam) | 43,5 t/s | 46,5 t/s |
+
+**`iq4_nl` kostet 40 %. Doppelter Kontext kostet 6 %.**
+
+Merke: **`q8_0` verwenden, solange er in den Speicher passt.** Reicht der Platz
+nicht, lieber Kontext opfern als Cache-Genauigkeit — Kontext ist billig.
 
 ### Spekulatives Dekodieren zahlt nur bei bandbreitenlimitierten Modellen
 
@@ -78,19 +109,6 @@ oder sprengt sie.
 | Karte 1 | 8066 MiB | **15173 MiB** |
 | gesamt | 23,1 GiB | **28,9 GiB** |
 
-### KV-Quantisierung bringt Platz, kein Tempo
-
-Qwen3.6-27B vollständig im VRAM, `llama-bench`:
-
-| | pp512 | tg128 |
-|---|---:|---:|
-| KV f16, ohne Flash-Attention | 1723,58 ± 53,55 | 42,92 ± 0,03 |
-| KV q8_0 + Flash-Attention | 1737,44 ± 53,69 | 42,88 ± 0,03 |
-
-Der Unterschied liegt unter dem Messrauschen. Der halbierte KV-Cache lohnt
-trotzdem — aber als **Platz-Hebel**, der bei großem Kontext eine weitere Schicht
-auf die Karte bringt, nicht als Tempo-Hebel.
-
 ### Mehr Parallelität ist oft langsamer
 
 - **Threads:** Bei 8-Kanal-DDR4 sättigen etwa 8 Kerne die Bandbreite. Ein
@@ -99,6 +117,10 @@ auf die Karte bringt, nicht als Tempo-Hebel.
 - **Zwei Karten:** Bei Layer-Split rechnen sie abwechselnd, nie gleichzeitig. Der
   Gewinn der zweiten Karte ist **Kapazität**, nicht Tempo — nur eben Kapazität,
   die verhindert, dass etwas über den RAM muss, und das wirkt dann stark.
+- **Auslagern in den RAM:** Eine Karte für andere Aufgaben freizuhalten und die
+  Gewichte teilweise in den RAM zu legen kostete **Faktor 5,5** (46,5 → 8,5 t/s).
+  Die Kurve ist dabei fast flach — der RAM-Anteil beherrscht alles, einzelne
+  Schichten zu verschieben bringt kaum etwas.
 - **Bauen:** `-j $(nproc)` sprengt bei CUDA den Speicher; 24 parallele
   `nvcc`-Prozesse für Template-Instanzen brauchen je mehrere GiB. Der OOM-Killer
   meldet sich als `Error 137` und sieht aus wie ein Compilerfehler. `-j 8` läuft
