@@ -17,6 +17,7 @@ wo Vorhersagen danebenlagen, steht das mit dabei.
 | CPU | AMD Ryzen Threadripper PRO 3945WX — 12 Kerne / 24 Threads, 8-Kanal DDR4-3200 |
 | RAM | 61 GiB (8 × 8 GB, alle Kanäle belegt) |
 | GPU | 2 × NVIDIA GeForce RTX 5070 Ti — je 16 GiB, zusammen **31,8 GiB VRAM** |
+| GPU (seit 28.08.) | zusätzlich 1 × AMD Radeon RX 6600 — 8 GiB, 224 GB/s |
 | Speicher | 937 GB NVMe |
 | System | Ubuntu 26.04, NVIDIA-Treiber 595.x, CUDA 13.3 |
 
@@ -30,6 +31,7 @@ wo Vorhersagen danebenlagen, steht das mit dabei.
 | [02.08.](FINDINGS-2026-08-02.md) | KV-Quantisierung und MTP am dichten 27B |
 | [04.08.](FINDINGS-2026-08-04.md) | DeepSeek V4 Flash in IQ2_M, Layer-Split ausgereizt, spekulatives Dekodieren |
 | [22.08.](FINDINGS-2026-08-22.md) | Qwen3.8-27B, KV-Cache-Quantisierung, Kosten einer freigehaltenen GPU |
+| [28.08.](FINDINGS-2026-08-28.md) | Dritte Karte (RX 6600) im Verbund, PCIe-Riser gemessen, Vulkan als gemeinsame Messlatte |
 
 Jede Datei verlinkt ihren Vorgänger und schließt mit einer Liste offener Punkte,
 die in die nächste übernommen wird.
