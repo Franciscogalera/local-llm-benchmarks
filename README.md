@@ -32,6 +32,7 @@ wo Vorhersagen danebenlagen, steht das mit dabei.
 | [04.08.](FINDINGS-2026-08-04.md) | DeepSeek V4 Flash in IQ2_M, Layer-Split ausgereizt, spekulatives Dekodieren |
 | [22.08.](FINDINGS-2026-08-22.md) | Qwen3.8-27B, KV-Cache-Quantisierung, Kosten einer freigehaltenen GPU |
 | [28.08.](FINDINGS-2026-08-28.md) | Dritte Karte (RX 6600) im Verbund, PCIe-Riser gemessen, Vulkan als gemeinsame Messlatte |
+| [29.08.](FINDINGS-2026-08-29.md) | Qwen3.8 Flash Next (177B) auf 32 GiB VRAM: KV-Kosten gemessen, CUDA gegen Vulkan, was die Festplatte wirklich kostet |
 
 Jede Datei verlinkt ihren Vorgänger und schließt mit einer Liste offener Punkte,
 die in die nächste übernommen wird.
