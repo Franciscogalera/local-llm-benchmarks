@@ -1,4 +1,4 @@
-# Lokale LLM-Benchmarks auf einer Threadripper-Workstation
+# Lokale LLM-Benchmarks auf einer Threadripper-/EPYC-Workstation
 
 Messreihen zu großen Sprachmodellen unter [llama.cpp](https://github.com/ggml-org/llama.cpp)
 auf eigener Hardware — mit Fokus darauf, **wo die Engpässe tatsächlich sitzen**
@@ -14,10 +14,11 @@ wo Vorhersagen danebenlagen, steht das mit dabei.
 
 | | |
 |---|---|
-| CPU | AMD Ryzen Threadripper PRO 3945WX — 12 Kerne / 24 Threads, 8-Kanal DDR4-3200 |
-| RAM | 61 GiB (8 × 8 GB, alle Kanäle belegt) |
+| CPU (bis 23.09.) | AMD Ryzen Threadripper PRO 3945WX — 12 Kerne / 24 Threads, 2 Chiplets, 8-Kanal DDR4-3200, gemessen 64 GB/s |
+| CPU (seit 24.09.) | AMD EPYC 7402 auf ASRock Rack ROME2D16-2T — 24 Kerne / 48 Threads, 4 Chiplets, 8-Kanal DDR4-3200, gemessen 90 GB/s; zweiter Sockel leer |
+| RAM | 61 GiB (8 × 8 GB) bis 14.09., seitdem 121–123 GiB (8 × 16 GB ECC, alle Kanäle belegt) |
 | GPU | 2 × NVIDIA GeForce RTX 5070 Ti — je 16 GiB, zusammen **31,8 GiB VRAM** |
-| GPU (seit 28.08.) | zusätzlich 1 × AMD Radeon RX 6600 — 8 GiB, 224 GB/s |
+| GPU (28.08.–24.09.) | zeitweise zusätzlich 1 × AMD Radeon RX 6600 — 8 GiB, 224 GB/s |
 | Speicher | 937 GB NVMe |
 | System | Ubuntu 26.04, NVIDIA-Treiber 595.x, CUDA 13.3 |
 
@@ -33,6 +34,9 @@ wo Vorhersagen danebenlagen, steht das mit dabei.
 | [22.08.](FINDINGS-2026-08-22.md) | Qwen3.8-27B, KV-Cache-Quantisierung, Kosten einer freigehaltenen GPU |
 | [28.08.](FINDINGS-2026-08-28.md) | Dritte Karte (RX 6600) im Verbund, PCIe-Riser gemessen, Vulkan als gemeinsame Messlatte |
 | [29.08.](FINDINGS-2026-08-29.md) | Qwen3.8 Flash Next (177B) auf 32 GiB VRAM: KV-Kosten gemessen, CUDA gegen Vulkan, was die Festplatte wirklich kostet |
+| [15.09.](FINDINGS-2026-09-15.md) | Speicher auf 123 GiB verdoppelt, zweiter Rechner per RPC als Erweiterung |
+| [16.09.](FINDINGS-2026-09-16.md) | Grosse MoE-Modelle brauchbar machen: `--n-cpu-moe`, `-ub`, Einlesen von 113 auf 524 t/s, EPYC-Auswahl nach Chiplet-Zahl |
+| [25.09.](FINDINGS-2026-09-25.md) | Umzug auf EPYC 7402: Erzeugen +30 %, Einlesen −22 %, STREAM 90 GB/s, Zwischenspiel nur RAM + RX 6600 |
 
 Jede Datei verlinkt ihren Vorgänger und schließt mit einer Liste offener Punkte,
 die in die nächste übernommen wird.
