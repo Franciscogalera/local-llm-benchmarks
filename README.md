@@ -36,7 +36,7 @@ wo Vorhersagen danebenlagen, steht das mit dabei.
 | [29.08.](FINDINGS-2026-08-29.md) | Qwen3.8 Flash Next (177B) auf 32 GiB VRAM: KV-Kosten gemessen, CUDA gegen Vulkan, was die Festplatte wirklich kostet |
 | [15.09.](FINDINGS-2026-09-15.md) | Speicher auf 123 GiB verdoppelt, zweiter Rechner per RPC als Erweiterung |
 | [16.09.](FINDINGS-2026-09-16.md) | Grosse MoE-Modelle brauchbar machen: `--n-cpu-moe`, `-ub`, Einlesen von 113 auf 524 t/s, EPYC-Auswahl nach Chiplet-Zahl |
-| [25.09.](FINDINGS-2026-09-25.md) | Umzug auf EPYC 7402: Erzeugen +30 %, Einlesen −22 %, STREAM 90 GB/s, Zwischenspiel nur RAM + RX 6600 |
+| [25.09.](FINDINGS-2026-09-25.md) | Umzug auf EPYC 7402: STREAM 90 GB/s, Flash-Next nach Split-Tuning 545 t/s Einlesen / 32 Erzeugen, warum `-ts` extrem kippen muss, Zwischenspiel nur RAM + RX 6600 |
 
 Jede Datei verlinkt ihren Vorgänger und schließt mit einer Liste offener Punkte,
 die in die nächste übernommen wird.
