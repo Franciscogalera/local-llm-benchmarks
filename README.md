@@ -37,6 +37,7 @@ wo Vorhersagen danebenlagen, steht das mit dabei.
 | [15.09.](FINDINGS-2026-09-15.md) | Speicher auf 123 GiB verdoppelt, zweiter Rechner per RPC als Erweiterung |
 | [16.09.](FINDINGS-2026-09-16.md) | Grosse MoE-Modelle brauchbar machen: `--n-cpu-moe`, `-ub`, Einlesen von 113 auf 524 t/s, EPYC-Auswahl nach Chiplet-Zahl |
 | [25.09.](FINDINGS-2026-09-25.md) | Umzug auf EPYC 7402: STREAM 90 GB/s, Flash-Next nach Split-Tuning 545 t/s Einlesen / 32 Erzeugen, warum `-ts` extrem kippen muss, Zwischenspiel nur RAM + RX 6600 |
+| [17.10.](FINDINGS-2026-10-17.md) | Zwei Rechner per RPC über 10 Gbit: GLM-5.3-Flash (321B) auf 121+61 GiB RAM; Port-Paarung entscheidet über 10G; `tensor-split` zählt RPC0 zuerst; 4+4 DIMMs halbieren jedes Modell |
 
 Jede Datei verlinkt ihren Vorgänger und schließt mit einer Liste offener Punkte,
 die in die nächste übernommen wird.
